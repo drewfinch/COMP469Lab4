@@ -7,10 +7,10 @@ import copy
 import fileinput
 
 class node:
-    def __init__(self, pos, parent):
+    def __init__(self, pos, parent, totalCost=0):
         self.pos = pos
         self.parent = parent
-        self.nextLeaf = 0           #used for tree search
+        self.totalCost = totalCost
 
 start = (2,7)
 goal = (7,7)
@@ -178,9 +178,15 @@ def greedySuccessor():
             fringe.append(node(leaf, candidate))
             mazeCpy[leaf[0]][leaf[1]] = 1
 
-#BFS search from previous lab
 def ucsSearch():
-   return None #Stub
+    goalReached = onGoal(fringe[0].pos)
+    
+    
+        
+    if (goalReached):
+        return extractPlan(fringe[0])
+    else:
+        return (None, 0)
     
 def greedySearch():
     return None #Stub
