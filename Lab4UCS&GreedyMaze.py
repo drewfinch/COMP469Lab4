@@ -71,10 +71,10 @@ def scanFile(file):
         for e in temp:
             if (e == "s"):
                 start = (row, column)
-                temp[column] = "0"
+                temp[column] = "1"
             elif (e == "d"):
                 goal = (row, column)
-                temp[column] = "0"
+                temp[column] = "1"
             
             column += 1
             
@@ -99,10 +99,10 @@ def scanInput(Input):
         for j in range(len(temp2)):
             if (temp2[j] == "s"):
                 start = (i, j)
-                temp2[j] = "0"
+                temp2[j] = "1"
             elif (temp2[j] == "d"):
                 goal = (i, j)
-                temp2[j] = "0"
+                temp2[j] = "1"
             
         maze.append(list(map(int, temp2)))
         
@@ -143,12 +143,11 @@ def onGoal(curPos):
         return False
     
 def extractPlan(candidate):
-    cost = 0
+    cost = candidate.totalCost
     plan = []
     currNode = candidate
     
     while (currNode.parent != None):
-        cost += 1
         plan.append(currNode.pos)
         currNode = currNode.parent
     
@@ -164,9 +163,23 @@ def ucsSuccessor():
     
     for x in range(4):
         leaf = tuple(map(lambda i, j: i + j, candidate.pos, directionPriority[0][x])) #adds tuples
-        if (inBounds(leaf) and mazeCpy[leaf[0]][leaf[1]] == 0):
-            fringe.append(node(leaf, candidate))
-            mazeCpy[leaf[0]][leaf[1]] = 1
+        if (inBounds(leaf) and mazeCpy[leaf[0]][leaf[1]] != 0):
+            totCost = candidate.totalCost + maze[leaf[0]][leaf[1]]
+            
+            index = 0
+            indexFound = False
+            
+            while (not indexFound and index <= len(fringe)):    #iterates to find sorted position in fringe
+                if (index >= len(fringe)):
+                    indexFound = True
+                    fringe.append(node(leaf, candidate, totCost))
+                elif (fringe[index].totalCost >= totCost):
+                    indexFound = True
+                    fringe.insert(index, node(leaf, candidate, totCost))
+                else:
+                    index += 1
+                    
+            mazeCpy[leaf[0]][leaf[1]] = 0
             
 def greedySuccessor():
     candidate = fringe.pop(0)
@@ -181,7 +194,11 @@ def greedySuccessor():
 def ucsSearch():
     goalReached = onGoal(fringe[0].pos)
     
-    
+    while (len(fringe) > 0 and not goalReached):
+        ucsSuccessor()
+        
+        if (len(fringe) > 0):
+            goalReached = onGoal(fringe[0].pos)
         
     if (goalReached):
         return extractPlan(fringe[0])
