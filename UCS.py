@@ -17,7 +17,6 @@ goal = (7,7)
 # start = (2,2)
 # goal = (3,3)
 fringe = [node(start, None)]
-closed = []
 
 directionPriority = [[(0,-1),(1,0),(0,1),(-1,0)], #left, down, right, up; default
                      [(-1,0),(0,1),(1,0),(0,-1)], #up, right, down, left
@@ -72,7 +71,7 @@ def scanFile(file):
             if (e == "s" or e == "s\n"):
                 start = (row, column)
                 temp[column] = "1"
-            elif (e == "d"):
+            elif (e == "d" or e == "d\n"):
                 goal = (row, column)
                 temp[column] = "1"
             
@@ -180,16 +179,6 @@ def ucsSuccessor():
                     index += 1
                     
             mazeCpy[leaf[0]][leaf[1]] = 0
-            
-def greedySuccessor():
-    candidate = fringe.pop(0)
-#    print(candidate.pos)     #for Debug
-    
-    for x in range(4):
-        leaf = tuple(map(lambda i, j: i + j, candidate.pos, directionPriority[0][x])) #adds tuples
-        if (inBounds(leaf) and mazeCpy[leaf[0]][leaf[1]] == 0):
-            fringe.append(node(leaf, candidate))
-            mazeCpy[leaf[0]][leaf[1]] = 1
 
 def ucsSearch():
     goalReached = onGoal(fringe[0].pos)
@@ -204,9 +193,6 @@ def ucsSearch():
         return extractPlan(fringe[0])
     else:
         return (None, 0)
-    
-def greedySearch():
-    return None #Stub
     
     
     
